@@ -39,6 +39,9 @@ class PermissionsSeeder extends Seeder
         $admin=Role::create(['name' => 'Administrador']);
     	$admin->givePermissionTo(Permission::all());
 
+        $supervisor=Role::create(['name' => 'Supervisor']);
+        $supervisor->givePermissionTo(['dashboard']);
+
         $client=Role::create(['name' => 'Cliente']);
 
     	$user=User::find(1);

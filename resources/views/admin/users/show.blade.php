@@ -44,9 +44,9 @@
 							<li class="contacts-block__item">
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-phone"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>@if(!is_null($user->phone)){{ $user->phone }}@else{{ "No Ingresado" }}@endif
 							</li>
-							{{-- <li class="contacts-block__item">
+							<li class="contacts-block__item">
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-square"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>{!! state($user->state) !!}
-							</li> --}}
+							</li>
 						</ul>
 					</div>                                    
 				</div>
@@ -69,6 +69,15 @@
 								<span class="h6 text-black"><b>Fecha de Registro:</b> {{ $user->created_at->format("d-m-Y H:i a") }}</span>
 							</li>
 							<li class="contacts-block__item">
+								<span class="h6 text-black"><b>Empresa:</b> @if(!is_null($user->company)){{ $user->company }}@else{{ 'No Ingresado' }}@endif</span>
+							</li>
+							<li class="contacts-block__item">
+								<span class="h6 text-black"><b>DOI:</b> @if(!is_null($user->doi)){{ $user->doi }}@else{{ 'No Ingresado' }}@endif</span>
+							</li>
+							<li class="contacts-block__item">
+								<span class="h6 text-black"><b>Dirección:</b> @if(!is_null($user->address)){{ $user->address }}@else{{ 'No Ingresado' }}@endif</span>
+							</li>
+							<li class="contacts-block__item">
 								<span class="h6 text-black"><b>Total de Códigos:</b> {{ $codes->count() }}</span>
 							</li>
 							<li class="contacts-block__item">
@@ -81,10 +90,7 @@
 								<span class="h6 text-black"><b>Total de Consultas:</b> {{ $codes->sum('queries') }}</span>
 							</li>
 							<li class="contacts-block__item">
-								<span class="h6 text-black"><b>Límite de Consultas Restante:</b> {{ $codes->where('state', '1')->sum('limit')-$codes->where('state', '1')->sum('queries') }}</span>
-							</li>
-							<li class="contacts-block__item">
-								<span class="h6 text-black"><b>Estado:</b> {!! state($user->state) !!}</span>
+								<span class="h6 text-black"><b>Límite de Consultas Restante:</b> @if($codes->where('state', '1')->where('limit', '!=', NULL)->sum('limit')-$codes->where('state', '1')->where('limit', '!=', NULL)->sum('queries')>0){{ $codes->where('state', '1')->where('limit', '!=', NULL)->sum('limit')-$codes->where('state', '1')->where('limit', '!=', NULL)->sum('queries') }}@else{{ '0' }}@endif</span>
 							</li>
 							<li class="contacts-block__item">
 								<a href="{{ route('usuarios.index') }}" class="btn btn-secondary">Volver</a>
@@ -138,13 +144,13 @@
 											<td>{{ $code->inquiries->where('type', '1')->first()->queries }}</td>
 											<td>{{ $code->inquiries->where('type', '2')->first()->queries }}</td>
 											<td>{{ $code->queries }}</td>
-											<td>{{ $code->limit }}</td>
+											<td>@if(is_null($code->limit)){{ 'Ilimitadas' }}@else{{ $code->limit }}@endif</td>
 											<td>{!! state($code->state) !!}</td>
 											@if(auth()->user()->can('codes.active') || auth()->user()->can('codes.deactive') || auth()->user()->can('codes.delete'))
 											<td>
 												<div class="btn-group" role="group">
 													@can('codes.edit')
-													<button type="button" class="btn btn-info btn-sm bs-tooltip" title="Editar" onclick="editCode('{{ $code->code }}', '{{ $code->name }}', '{{ $code->limit }}')"><i class="fa fa-edit"></i></button>
+													<button type="button" class="btn btn-info btn-sm bs-tooltip" title="Editar" onclick="editCode('{{ $code->code }}', '{{ $code->name }}', '{{ $code->limit }}', @if(is_null($code->limit)){{ true }}@else{{ false }}@endif)"><i class="fa fa-edit"></i></button>
 													@endcan
 													@if($code->state==1)
 													@can('codes.deactive')
@@ -195,8 +201,13 @@
 					</div>
 
 					<div class="form-group col-12">
-						<label class="col-form-label">Límite<b class="text-danger">*</b></label>
-						<input type="text" class="form-control number int @error('limit') is-invalid @enderror" name="limit" required placeholder="Introduzca el límite de consultas" value="1000">
+						<label class="col-form-label">Límite<b class="text-danger">*</b> <button type="button" class="btn btn-sm btn-primary ml-2 px-2 py-1" id="limitInfinity"><i class="fa fa-infinity"></i></button></label>
+
+						<div id="limitCreate">
+							<input type="text" class="form-control number int @error('limit') is-invalid @enderror" name="limit" required placeholder="Introduzca el límite de consultas" value="1000">
+						</div>
+
+						<input type="text" class="form-control d-none" disabled value="Ilimitadas" id="infinityCreate">
 					</div>
 				</div>
 			</div>
@@ -235,8 +246,13 @@
 					</div>
 
 					<div class="form-group col-12">
-						<label class="col-form-label">Límite<b class="text-danger">*</b></label>
-						<input type="text" class="form-control number int @error('limit') is-invalid @enderror" name="limit" placeholder="Introduzca el límite de consultas" value="1000">
+						<label class="col-form-label">Límite<b class="text-danger">*</b> <button type="button" class="btn btn-sm btn-primary ml-2 px-2 py-1" id="limitInfinityEdit"><i class="fa fa-infinity"></i></button></label>
+
+						<div id="limitEdit">
+							<input type="text" class="form-control number int @error('limit') is-invalid @enderror" name="limit" placeholder="Introduzca el límite de consultas" value="1000">
+						</div>
+
+						<input type="text" class="form-control d-none" disabled value="Ilimitadas" id="infinityEdit">
 					</div>
 				</div>
 			</div>

@@ -30,6 +30,9 @@ class ProfileUpdateRequest extends FormRequest
       'name' => 'required|string|min:2|max:191',
       'lastname' => 'required|string|min:2|max:191',
       'phone' => 'required|string|min:5|max:15',
+      'company' => 'nullable|string|min:2|max:191',
+      'doi' => 'nullable|string|min:2|max:191',
+      'address' => 'required|string|min:2|max:191',
       'password' => 'nullable|string|min:8|confirmed'
     ];
   }

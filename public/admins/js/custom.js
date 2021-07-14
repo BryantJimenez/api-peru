@@ -327,10 +327,57 @@ function addCode() {
 };
 
 // Funcion para abrir modal de edicion de codigo
-function editCode(code, name, limit) {
+function editCode(code, name, limit, infinity) {
+  if (infinity) {
+    $('#limitInfinityEdit').addClass('btn-danger');
+    $('#limitInfinityEdit').removeClass('btn-primary');
+    $('#limitEdit').addClass('d-none');
+    $('#limitEdit input').attr('disabled', true);
+    $('#infinityEdit').removeClass('d-none');
+    $('#formEditCodeModal input[name="limit"]').val('1000');
+  } else {
+    $('#limitInfinityEdit').addClass('btn-primary');
+    $('#limitInfinityEdit').removeClass('btn-danger');
+    $('#infinityEdit').addClass('d-none');
+    $('#limitEdit input').attr('disabled', false);
+    $('#limitEdit').removeClass('d-none');
+    $('#formEditCodeModal input[name="limit"]').val(limit);
+  }
   $('#formEditCodeModal input[name="code"]').val(code);
   $('#formEditCodeModal input[name="name"]').val(name);
-  $('#formEditCodeModal input[name="limit"]').val(limit);
   $("#editCode").modal();
   $('#formEditCodeModal').attr('action', '/admin/codigos/' + code);
 };
+
+// funcion para agregar o quitar limite infinito
+$('#limitInfinity').click(function(event) {
+  if ($('#infinityCreate').hasClass('d-none')) {
+    $(this).addClass('btn-danger');
+    $(this).removeClass('btn-primary');
+    $('#limitCreate').addClass('d-none');
+    $('#limitCreate input').attr('disabled', true);
+    $('#infinityCreate').removeClass('d-none');
+  } else {
+    $(this).addClass('btn-primary');
+    $(this).removeClass('btn-danger');
+    $('#infinityCreate').addClass('d-none');
+    $('#limitCreate input').attr('disabled', false);
+    $('#limitCreate').removeClass('d-none');
+  }  
+});
+
+$('#limitInfinityEdit').click(function(event) {
+  if ($('#infinityEdit').hasClass('d-none')) {
+    $(this).addClass('btn-danger');
+    $(this).removeClass('btn-primary');
+    $('#limitEdit').addClass('d-none');
+    $('#limitEdit input').attr('disabled', true);
+    $('#infinityEdit').removeClass('d-none');
+  } else {
+    $(this).addClass('btn-primary');
+    $(this).removeClass('btn-danger');
+    $('#infinityEdit').addClass('d-none');
+    $('#limitEdit input').attr('disabled', false);
+    $('#limitEdit').removeClass('d-none');
+  }  
+});

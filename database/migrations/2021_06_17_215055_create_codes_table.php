@@ -18,7 +18,7 @@ class CreateCodesTable extends Migration
             $table->string('name');
             $table->string('code')->unique();
             $table->integer('queries')->default(0);
-            $table->integer('limit')->default(0);
+            $table->integer('limit')->default(0)->nullable();
             $table->string('mac')->nullable();
             $table->enum('state', [0, 1])->default(1);
             $table->bigInteger('user_id')->unsigned()->nullable();

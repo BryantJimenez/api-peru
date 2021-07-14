@@ -42,7 +42,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(UserStoreRequest $request) {
-        $data=array('name' => request('name'), 'lastname' => request('lastname'), 'phone' => request('phone'), 'email' => request('email'), 'password' => Hash::make(request('password')));
+        $data=array('name' => request('name'), 'lastname' => request('lastname'), 'phone' => request('phone'), 'company' => request('company'), 'doi' => request('doi'), 'address' => request('address'), 'email' => request('email'), 'password' => Hash::make(request('password')));
         $user=User::create($data);
 
         if ($user) {
@@ -105,7 +105,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(UserUpdateRequest $request, User $user) {
-        $data=array('name' => request('name'), 'lastname' => request('lastname'), 'state' => request('state'), 'phone' => request('phone'));
+        $data=array('name' => request('name'), 'lastname' => request('lastname'), 'phone' => request('phone'), 'company' => request('company'), 'doi' => request('doi'), 'address' => request('address'), 'state' => request('state'));
         $user->fill($data)->save();        
 
         if ($user) {

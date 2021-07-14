@@ -25,7 +25,7 @@ class CodeUpdateRequest extends FormRequest
     {
         return [
             'name' => 'required|string|min:2|max:191',
-            'limit' => 'required|numeric|min:1'
+            'limit' => 'nullable|numeric|min:1'
         ];
     }
 }

@@ -13,6 +13,7 @@
         "fabpot/goutte": "^4.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
+        "giansalex/peru-consult": "^4.4",
         "guzzlehttp/guzzle": "^6.3.1|^7.0.1",
         "jenssegers/agent": "^2.6",
         "laravel/framework": "^7.29",

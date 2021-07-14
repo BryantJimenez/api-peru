@@ -10,10 +10,9 @@ use App\Query;
 use App\Ubigeo;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
-use App\Imports\RucsImport;
+use Peru\Jne\DniFactory;
 use Goutte\Client;
 use App\Rules\Mac;
 
@@ -31,7 +30,7 @@ class ApiController extends Controller
 			return response()->json(['status' => 403, "message" => "Este código no le pertenece a este usuario."], 403);
 		} elseif ($code->state=='0') {
 			return response()->json(['status' => 401, "message" => "Este código ha sido desactivado."], 401);
-		} elseif ($code->queries>=$code->limit) {
+		} elseif (!is_null($code->limit) && $code->queries>=$code->limit) {
 			return response()->json(['status' => 401, "message" => "Se ha alcanzado el límite de consultas."], 401);
 		}
 
@@ -48,12 +47,33 @@ class ApiController extends Controller
 
 		$dni_exist=Dni::where('dni', $dni)->first();
 		if (is_null($dni_exist)) {
-			$client=new Client();
-			$crawler=$client->request('GET', 'https://eldni.com/pe/buscar-por-dni');
-			$form=$crawler->selectButton('Buscar nombres')->form();
-			$crawler=$client->submit($form, ['dni' => $dni]);
+			try {
+				$dni_factory=new DniFactory();
+				$query_factory=$dni_factory->create();
+				$person=$query_factory->get($dni);
+
+				if (!is_null($person)) {
+					$data=array('dni' => $person->dni, 'name' => $person->nombres, 'first_lastname' => $person->apellidoPaterno, 'second_lastname' => $person->apellidoMaterno, 'code' => $person->codVerifica);
+					Dni::create($data);
+					$code->fill(['queries' => $code->queries+1])->save();
+
+					$query=Query::where([['type', '1'], ['code_id', $code->id]])->first();
+					if (!is_null($query)) {
+						$query->fill(['queries' => $query->queries+1])->save();
+					}
+
+					$data=array('dni' => $person->dni, 'nombres' => $person->nombres, 'apellidopaterno' => $person->apellidoPaterno, 'apellidomaterno' => $person->apellidoMaterno, 'codverifica' => $person->codVerifica);
+					return response()->json(['status' => 200, "data" => $data], 200);
+				}
+			} catch (Exception $e) {
+				Log::error($e->getMessage());
+			}
 
 			try {
+				$client=new Client();
+				$crawler=$client->request('GET', 'https://eldni.com/pe/buscar-por-dni');
+				$form=$crawler->selectButton('Buscar nombres')->form();
+				$crawler=$client->submit($form, ['dni' => $dni]);
 
 				$data=$crawler->filter("table tbody td")->each(function($dataNodes) {
 					return $dataNodes->text();
@@ -86,6 +106,9 @@ class ApiController extends Controller
 		}
 
 		$data=array('dni' => $dni_exist->dni, 'nombres' => $dni_exist->name, 'apellidopaterno' => $dni_exist->first_lastname, 'apellidomaterno' => $dni_exist->second_lastname);
+		if (!is_null($dni_exist->code)) {
+			$data=array('dni' => $dni_exist->dni, 'nombres' => $dni_exist->name, 'apellidopaterno' => $dni_exist->first_lastname, 'apellidomaterno' => $dni_exist->second_lastname, 'codverifica' => $dni_exist->code);
+		}
 		return response()->json(['status' => 200, "data" => $data], 200);
 	}
 
@@ -101,7 +124,7 @@ class ApiController extends Controller
 			return response()->json(['status' => 403, "message" => "Este código no le pertenece a este usuario."], 403);
 		} elseif ($code->state=='0') {
 			return response()->json(['status' => 401, "message" => "Este código ha sido desactivado."], 401);
-		} elseif ($code->queries>=$code->limit) {
+		} elseif (!is_null($code->limit) && $code->queries>=$code->limit) {
 			return response()->json(['status' => 401, "message" => "Se ha alcanzado el límite de consultas."], 401);
 		}
 

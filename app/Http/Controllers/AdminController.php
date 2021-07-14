@@ -16,12 +16,17 @@ class AdminController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index() {
+        if(Auth::user()->hasRole('Supervisor')) {
+            return redirect()->route('profile');
+        }
+
         $users=User::count();
         return view('admin.home', compact('users'));
     }
 
     public function profile() {
-        return view('admin.profile');
+        $codes=Auth::user()->codes;
+        return view('admin.profile', compact('codes'));
     }
 
     public function profileEdit() {
@@ -30,7 +35,7 @@ class AdminController extends Controller
 
     public function profileUpdate(ProfileUpdateRequest $request) {
         $user=User::where('slug', Auth::user()->slug)->firstOrFail();
-        $data=array('name' => request('name'), 'lastname' => request('lastname'), 'phone' => request('phone'));
+        $data=array('name' => request('name'), 'lastname' => request('lastname'), 'phone' => request('phone'), 'company' => request('company'), 'doi' => request('doi'), 'address' => request('address'));
 
         if (!is_null(request('password'))) {
             $data['password']=Hash::make(request('password'));
@@ -50,6 +55,9 @@ class AdminController extends Controller
             Auth::user()->name=request('name');
             Auth::user()->lastname=request('lastname');
             Auth::user()->phone=request('phone');
+            Auth::user()->company=request('company');
+            Auth::user()->doi=request('doi');
+            Auth::user()->address=request('address');
             if (!is_null(request('password'))) {
                 Auth::user()->password=Hash::make(request('password'));
             }

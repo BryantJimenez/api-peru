@@ -148,6 +148,24 @@ $(document).ready(function(){
 					maxlength: 15
 				},
 
+				company: {
+					required: false,
+					minlength: 2,
+					maxlength: 191
+				},
+
+				doi: {
+					required: false,
+					minlength: 2,
+					maxlength: 191
+				},
+
+				address: {
+					required: true,
+					minlength: 2,
+					maxlength: 191
+				},
+
 				password: {
 					required: false,
 					minlength: 8,
@@ -199,6 +217,24 @@ $(document).ready(function(){
 					required: true,
 					minlength: 5,
 					maxlength: 15
+				},
+
+				company: {
+					required: false,
+					minlength: 2,
+					maxlength: 191
+				},
+
+				doi: {
+					required: false,
+					minlength: 2,
+					maxlength: 191
+				},
+
+				address: {
+					required: true,
+					minlength: 2,
+					maxlength: 191
 				},
 
 				type: {

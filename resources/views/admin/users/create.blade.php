@@ -61,6 +61,21 @@
 								</div>
 
 								<div class="form-group col-lg-6 col-md-6 col-12">
+									<label class="col-form-label">Empresa (Opcional)</label>
+									<input class="form-control @error('company') is-invalid @enderror" type="text" name="company" required placeholder="Introduzca el nombre de la empresa" value="{{ old('company') }}">
+								</div>
+
+								<div class="form-group col-lg-6 col-md-6 col-12">
+									<label class="col-form-label">DOI (Opcional)</label>
+									<input class="form-control @error('doi') is-invalid @enderror" type="text" name="doi" required placeholder="Introduzca un DOI" value="{{ old('doi') }}">
+								</div>
+
+								<div class="form-group col-lg-6 col-md-6 col-12">
+									<label class="col-form-label">Dirección<b class="text-danger">*</b></label>
+									<input class="form-control @error('address') is-invalid @enderror" type="text" name="address" required placeholder="Introduzca una dirección" value="{{ old('address') }}">
+								</div>
+
+								<div class="form-group col-lg-6 col-md-6 col-12">
 									<label class="col-form-label">Tipo<b class="text-danger">*</b></label>
 									<select class="form-control @error('type') is-invalid @enderror" name="type" required>
 										<option value="">Seleccione</option>

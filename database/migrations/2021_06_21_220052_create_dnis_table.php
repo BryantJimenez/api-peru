@@ -19,6 +19,7 @@ class CreateDnisTable extends Migration
             $table->text('name')->nullable();
             $table->text('first_lastname')->nullable();
             $table->text('second_lastname')->nullable();
+            $table->string('code')->nullable();
             $table->timestamps();
         });
     }
