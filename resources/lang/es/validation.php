@@ -154,6 +154,7 @@ return [
         'password_confirmation' => 'confirmar contraseña',
         'state'                 => 'estado',
         'limit'                 => 'límite',
+        'company'               => 'empresa'
     ],
 ];
 ?>

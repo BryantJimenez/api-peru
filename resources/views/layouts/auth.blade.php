@@ -11,6 +11,7 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Quicksand:400,500,600,700&display=swap" rel="stylesheet">
     <link href="{{ asset('/admins/css/bootstrap/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('/admins/css/fontawesome/all.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/admins/css/plugins.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/admins/css/authentication/form-2.css') }}" rel="stylesheet" type="text/css" />
     <!-- END GLOBAL MANDATORY STYLES -->
