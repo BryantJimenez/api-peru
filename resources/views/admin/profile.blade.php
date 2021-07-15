@@ -122,7 +122,7 @@
 											<td>{{ $code->inquiries->where('type', '1')->first()->queries }}</td>
 											<td>{{ $code->inquiries->where('type', '2')->first()->queries }}</td>
 											<td>{{ $code->queries }}</td>
-											<td>{{ $code->limit }}</td>
+											<td>@if(is_null($code->limit)){{ 'Ilimitadas' }}@else{{ $code->limit }}@endif</td>
 											<td>{!! state($code->state) !!}</td>
 										</tr>
 										@endforeach
