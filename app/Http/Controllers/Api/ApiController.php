@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Peru\Sunat\RucFactory;
 use Peru\Jne\DniFactory;
 use Goutte\Client;
 use App\Rules\Mac;
@@ -141,28 +142,77 @@ class ApiController extends Controller
 
 		$ruc_exist=Ruc::where('ruc', $ruc)->first();
 		if (is_null($ruc_exist)) {
+			try {
+				$ruc_factory=new RucFactory();
+				$query_factory=$ruc_factory->create();
+				$company=$query_factory->get($ruc);
+
+				if (!is_null($company)) {
+					$code->fill(['queries' => $code->queries+1])->save();
+
+					$query=Query::where([['type', '2'], ['code_id', $code->id]])->first();
+					if (!is_null($query)) {
+						$query->fill(['queries' => $query->queries+1])->save();
+					}
+
+					$ubigeo=Ubigeo::where([['department', $company->departamento], ['province', $company->provincia], ['district', $company->distrito]])->first();
+					$ubigeo=(!is_null($ubigeo)) ? $ubigeo->code : "";
+
+					$data=array('ruc' => $company->ruc, 'razonsocial' => $company->razonSocial, 'estado' => $company->estado, 'condicion' => $company->condicion, 'direccion' => $company->direccion, 'departamento' => $company->departamento, 'provincia' => $company->provincia, 'distrito' => $company->distrito, 'ubigeo' => $ubigeo);
+					return response()->json(['status' => 200, "data" => $data], 200);
+				}
+			} catch (Exception $e) {
+				Log::error($e->getMessage());
+			}
+
+			try {
+				$client=new Client();
+				$crawler=$client->request('GET', 'https://www.wmtechnology.org/Consultar-RUC');
+				$form=$crawler->selectButton('Buscar')->form();
+				$crawler=$client->submit($form, ['nruc' => $ruc]);
+
+				$data=$crawler->filter("div[class='list-group'] div[class~='list-group-item']")->each(function($dataNodes) {
+					return $dataNodes->filter("div[class='col-sm-7']")->text();
+				});
+
+				if (is_array($data)) {
+					$code->fill(['queries' => $code->queries+1])->save();
+
+					$query=Query::where([['type', '1'], ['code_id', $code->id]])->first();
+					if (!is_null($query)) {
+						$query->fill(['queries' => $query->queries+1])->save();
+					}
+
+					$data=array('ruc' => $ruc, 'razonsocial' => substr($data[0], 14), 'estado' => $data[1], 'condicion' => $data[2], 'direccion' => $data[7], 'departamento' => $data[4], 'provincia' => $data[5], 'distrito' => $data[6], 'ubigeo' => $data[3]);
+					return response()->json(['status' => 200, "data" => $data], 200);
+				}
+
+			} catch (Exception $e) {
+				Log::error($e->getMessage());
+			}
+
 			return response()->json(['status' => 404, "message" => "No se encontró al cliente."], 404);
 		}
 
 		$ubigeo=Ubigeo::where('code', $ruc_exist->ubigeo)->first();
 
-		$condition=(!is_null($ruc_exist->condition)) ? $ruc_exist->condition : "";
+		$condition=(!is_null($ruc_exist->condition) && !empty($ruc_exist->condition)) ? $ruc_exist->condition : "";
 		$department=(!is_null($ubigeo)) ? $ubigeo->department : "";
 		$province=(!is_null($ubigeo)) ? $ubigeo->province : "";
 		$district=(!is_null($ubigeo)) ? $ubigeo->district : "";
 		$ubigeo=(!is_null($ubigeo)) ? $ubigeo->code : "";
 
-		$type_way=(!is_null($ruc_exist->type_way)) ? $ruc_exist->type_way." " : "";
-		$name_way=(!is_null($ruc_exist->name_way)) ? $ruc_exist->name_way." " : "";
-		$number=(!is_null($ruc_exist->number)) ? "NRO. ".$ruc_exist->number." " : "";
-		$inside=(!is_null($ruc_exist->inside)) ? "INT. ".$ruc_exist->inside." " : "";
-		$dpto=(!is_null($ruc_exist->department)) ? "DPTO. ".$ruc_exist->department." " : "";
-		$zone_code=(!is_null($ruc_exist->zone_code)) ? $ruc_exist->zone_code." " : "";
-		$type_zone=(!is_null($ruc_exist->type_zone)) ? $ruc_exist->type_zone." " : "";
-		$block=(!is_null($ruc_exist->block)) ? "MZ. ".$ruc_exist->block." " : "";
-		$lot=(!is_null($ruc_exist->lot)) ? "LOTE. ".$ruc_exist->lot." " : "";
-		$km=(!is_null($ruc_exist->km)) ? "KM. ".$ruc_exist->km." " : "";
-		if (!is_null($ruc_exist->number)) {
+		$type_way=(!is_null($ruc_exist->type_way) && !empty($ruc_exist->type_way)) ? $ruc_exist->type_way." " : "";
+		$name_way=(!is_null($ruc_exist->name_way) && !empty($ruc_exist->name_way)) ? $ruc_exist->name_way." " : "";
+		$number=(!is_null($ruc_exist->number) && !empty($ruc_exist->number)) ? "NRO. ".$ruc_exist->number." " : "";
+		$inside=(!is_null($ruc_exist->inside) && !empty($ruc_exist->inside)) ? "INT. ".$ruc_exist->inside." " : "";
+		$dpto=(!is_null($ruc_exist->department) && !empty($ruc_exist->department)) ? "DPTO. ".$ruc_exist->department." " : "";
+		$zone_code=(!is_null($ruc_exist->zone_code) && !empty($ruc_exist->zone_code)) ? $ruc_exist->zone_code." " : "";
+		$type_zone=(!is_null($ruc_exist->type_zone) && !empty($ruc_exist->type_zone)) ? $ruc_exist->type_zone." " : "";
+		$block=(!is_null($ruc_exist->block) && !empty($ruc_exist->block)) ? "MZ. ".$ruc_exist->block." " : "";
+		$lot=(!is_null($ruc_exist->lot) && !empty($ruc_exist->lot)) ? "LOTE. ".$ruc_exist->lot." " : "";
+		$km=(!is_null($ruc_exist->km) && !empty($ruc_exist->km)) ? "KM. ".$ruc_exist->km." " : "";
+		if (!is_null($ruc_exist->number) && !empty($ruc_exist->number)) {
 			$address=$type_way.$name_way.$number.$inside.$dpto.$zone_code.$type_zone.$block.$lot.$km;
 		} else {
 			$address=$type_way.$name_way.$block.$lot.$km.$inside.$dpto.$zone_code.$type_zone;

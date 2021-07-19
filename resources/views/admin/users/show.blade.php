@@ -130,7 +130,7 @@
 											<th>Total</th>
 											<th>Límite</th>
 											<th>Estado</th>
-											@if(auth()->user()->can('codes.active') || auth()->user()->can('codes.deactive') || auth()->user()->can('codes.delete'))
+											@if(auth()->user()->can('codes.edit') || auth()->user()->can('codes.active') || auth()->user()->can('codes.deactive') || auth()->user()->can('codes.revert') || auth()->user()->can('codes.delete'))
 											<th>Acciones</th>
 											@endif
 										</tr>
@@ -146,7 +146,7 @@
 											<td>{{ $code->queries }}</td>
 											<td>@if(is_null($code->limit)){{ 'Ilimitadas' }}@else{{ $code->limit }}@endif</td>
 											<td>{!! state($code->state) !!}</td>
-											@if(auth()->user()->can('codes.active') || auth()->user()->can('codes.deactive') || auth()->user()->can('codes.delete'))
+											@if(auth()->user()->can('codes.edit') || auth()->user()->can('codes.active') || auth()->user()->can('codes.deactive') || auth()->user()->can('codes.revert') || auth()->user()->can('codes.delete'))
 											<td>
 												<div class="btn-group" role="group">
 													@can('codes.edit')
@@ -159,6 +159,11 @@
 													@else
 													@can('codes.active')
 													<button type="button" class="btn btn-success btn-sm bs-tooltip" title="Activar" onclick="activeCode('{{ $code->code }}')"><i class="fa fa-check"></i></button>
+													@endcan
+													@endif
+													@if(!is_null($code->mac))
+													@can('codes.revert')
+													<button type="button" class="btn btn-warning btn-sm bs-tooltip" title="Revertir MAC" onclick="revertCode('{{ $code->code }}')"><i class="fas fa-history"></i></button>
 													@endcan
 													@endif
 													@can('codes.delete')
@@ -304,6 +309,29 @@
 					@csrf
 					@method('PUT')
 					<button type="submit" class="btn btn-primary">Activar</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+@endcan
+
+@can('codes.revert')
+<div class="modal fade" id="revertCode" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">¿Estás seguro de que quieres revertir la MAC de este código?</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn" data-dismiss="modal">Cancelar</button>
+				<form action="#" method="POST" id="formRevertCode">
+					@csrf
+					@method('PUT')
+					<button type="submit" class="btn btn-primary">Revertir</button>
 				</form>
 			</div>
 		</div>

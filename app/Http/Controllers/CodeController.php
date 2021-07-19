@@ -88,4 +88,13 @@ class CodeController extends Controller
             return redirect()->back()->with(['alert' => 'lobibox', 'type' => 'error', 'title' => 'Edición fallida', 'msg' => 'Ha ocurrido un error durante el proceso, intentelo nuevamente.']);
         }
     }
+
+    public function revert(Request $request, Code $code) {
+        $code->fill(['mac' => NULL])->save();
+        if ($code) {
+            return redirect()->back()->with(['alert' => 'sweet', 'type' => 'success', 'title' => 'Edición exitosa', 'msg' => 'El código ha sido revertido exitosamente.']);
+        } else {
+            return redirect()->back()->with(['alert' => 'lobibox', 'type' => 'error', 'title' => 'Edición fallida', 'msg' => 'Ha ocurrido un error durante el proceso, intentelo nuevamente.']);
+        }
+    }
 }

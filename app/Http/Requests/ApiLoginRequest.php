@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\Mac;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ApiLoginRequest extends FormRequest
@@ -26,7 +25,6 @@ class ApiLoginRequest extends FormRequest
     {
         return [
             'email' => 'required|string|email|min:5|max:191|exists:users,email',
-            'mac' => ['required', new Mac()],
             'password' => 'required|string|min:8'
         ];
     }

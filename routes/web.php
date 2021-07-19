@@ -49,4 +49,5 @@ Route::group(['middleware' => ['auth', 'admin']], function () {
 	Route::delete('/admin/codigos/{code:code}', 'CodeController@destroy')->name('codigos.delete')->middleware('permission:codes.delete');
 	Route::put('/admin/codigos/{code:code}/activar', 'CodeController@activate')->name('codigos.activate')->middleware('permission:codes.active');
 	Route::put('/admin/codigos/{code:code}/desactivar', 'CodeController@deactivate')->name('codigos.deactivate')->middleware('permission:codes.deactive');
+	Route::put('/admin/codigos/{code:code}/revertir', 'CodeController@revert')->name('codigos.revert')->middleware('permission:codes.revert');
 });

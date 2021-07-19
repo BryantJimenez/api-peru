@@ -32,6 +32,7 @@ class PermissionsSeeder extends Seeder
         Permission::create(['name' => 'codes.delete']);
         Permission::create(['name' => 'codes.active']);
         Permission::create(['name' => 'codes.deactive']);
+        Permission::create(['name' => 'codes.revert']);
 
     	$superadmin=Role::create(['name' => 'Super Admin']);
         $superadmin->givePermissionTo(Permission::all());
@@ -40,7 +41,7 @@ class PermissionsSeeder extends Seeder
     	$admin->givePermissionTo(Permission::all());
 
         $supervisor=Role::create(['name' => 'Supervisor']);
-        $supervisor->givePermissionTo(['dashboard']);
+        $supervisor->givePermissionTo(['dashboard', 'codes.revert']);
 
         $client=Role::create(['name' => 'Cliente']);
 

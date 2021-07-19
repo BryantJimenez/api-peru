@@ -310,6 +310,11 @@ function activeCode(code) {
   $('#formActiveCode').attr('action', '/admin/codigos/' + code + '/activar');
 }
 
+function revertCode(code) {
+  $("#revertCode").modal();
+  $('#formRevertCode').attr('action', '/admin/codigos/' + code + '/revertir');
+}
+
 //funciones para preguntar al eliminar
 function deleteUser(slug) {
   $("#deleteUser").modal();

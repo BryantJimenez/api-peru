@@ -7,6 +7,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -56,6 +57,10 @@ class Handler extends ExceptionHandler
         if (request()->header('Content-Type')=='application/json' || (isset(explode('/', $request->url())[3]) && explode('/', $request->url())[3]=="api")) {
             if ($exception instanceof MethodNotAllowedHttpException) {
                 return response()->json(['status' => 405, 'message' => 'El método especificado en la petición no es valido'], 405);
+            }
+
+            if ($exception instanceof NotFoundHttpException) {
+                return response()->json(['status' => 404, 'message' => 'No se han encontrado resultados'], 404);
             }
 
             if ($exception instanceof AuthenticationException) {
