@@ -18,7 +18,7 @@ class CreateRucsTable extends Migration
             $table->string('ruc')->unique();
             $table->text('name')->nullable();
             $table->text('state')->nullable();
-            $table->text('condition')->nullable();
+            $table->text('condition_')->nullable();
             $table->text('ubigeo')->nullable();
             $table->text('type_way')->nullable();
             $table->text('name_way')->nullable();

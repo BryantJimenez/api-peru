@@ -196,23 +196,23 @@ class ApiController extends Controller
 
 		$ubigeo=Ubigeo::where('code', $ruc_exist->ubigeo)->first();
 
-		$condition=(!is_null($ruc_exist->condition) && !empty($ruc_exist->condition)) ? $ruc_exist->condition : "";
+		$condition=(!is_null($ruc_exist->condition_) && !empty($ruc_exist->condition_) && $ruc_exist->condition_!='-' && $ruc_exist->condition_!='----') ? $ruc_exist->condition_ : "";
 		$department=(!is_null($ubigeo)) ? $ubigeo->department : "";
 		$province=(!is_null($ubigeo)) ? $ubigeo->province : "";
 		$district=(!is_null($ubigeo)) ? $ubigeo->district : "";
 		$ubigeo=(!is_null($ubigeo)) ? $ubigeo->code : "";
 
-		$type_way=(!is_null($ruc_exist->type_way) && !empty($ruc_exist->type_way)) ? $ruc_exist->type_way." " : "";
-		$name_way=(!is_null($ruc_exist->name_way) && !empty($ruc_exist->name_way)) ? $ruc_exist->name_way." " : "";
-		$number=(!is_null($ruc_exist->number) && !empty($ruc_exist->number)) ? "NRO. ".$ruc_exist->number." " : "";
-		$inside=(!is_null($ruc_exist->inside) && !empty($ruc_exist->inside)) ? "INT. ".$ruc_exist->inside." " : "";
-		$dpto=(!is_null($ruc_exist->department) && !empty($ruc_exist->department)) ? "DPTO. ".$ruc_exist->department." " : "";
-		$zone_code=(!is_null($ruc_exist->zone_code) && !empty($ruc_exist->zone_code)) ? $ruc_exist->zone_code." " : "";
-		$type_zone=(!is_null($ruc_exist->type_zone) && !empty($ruc_exist->type_zone)) ? $ruc_exist->type_zone." " : "";
-		$block=(!is_null($ruc_exist->block) && !empty($ruc_exist->block)) ? "MZ. ".$ruc_exist->block." " : "";
-		$lot=(!is_null($ruc_exist->lot) && !empty($ruc_exist->lot)) ? "LOTE. ".$ruc_exist->lot." " : "";
-		$km=(!is_null($ruc_exist->km) && !empty($ruc_exist->km)) ? "KM. ".$ruc_exist->km." " : "";
-		if (!is_null($ruc_exist->number) && !empty($ruc_exist->number)) {
+		$type_way=(!is_null($ruc_exist->type_way) && !empty($ruc_exist->type_way) && $ruc_exist->type_way!='-' && $ruc_exist->type_way!='----') ? $ruc_exist->type_way." " : "";
+		$name_way=(!is_null($ruc_exist->name_way) && !empty($ruc_exist->name_way) && $ruc_exist->name_way!='-' && $ruc_exist->name_way!='----') ? $ruc_exist->name_way." " : "";
+		$number=(!is_null($ruc_exist->number) && !empty($ruc_exist->number) && $ruc_exist->number!='-' && $ruc_exist->number!='----') ? "NRO. ".$ruc_exist->number." " : "";
+		$inside=(!is_null($ruc_exist->inside) && !empty($ruc_exist->inside) && $ruc_exist->inside!='-' && $ruc_exist->inside!='----') ? "INT. ".$ruc_exist->inside." " : "";
+		$dpto=(!is_null($ruc_exist->department) && !empty($ruc_exist->department) && $ruc_exist->department!='-' && $ruc_exist->department!='----') ? "DPTO. ".$ruc_exist->department." " : "";
+		$zone_code=(!is_null($ruc_exist->zone_code) && !empty($ruc_exist->zone_code) && $ruc_exist->zone_code!='-' && $ruc_exist->zone_code!='----') ? $ruc_exist->zone_code." " : "";
+		$type_zone=(!is_null($ruc_exist->type_zone) && !empty($ruc_exist->type_zone) && $ruc_exist->type_zone!='-' && $ruc_exist->type_zone!='----') ? $ruc_exist->type_zone." " : "";
+		$block=(!is_null($ruc_exist->block) && !empty($ruc_exist->block) && $ruc_exist->block!='-' && $ruc_exist->block!='----') ? "MZ. ".$ruc_exist->block." " : "";
+		$lot=(!is_null($ruc_exist->lot) && !empty($ruc_exist->lot) && $ruc_exist->lot!='-' && $ruc_exist->lot!='----') ? "LOTE. ".$ruc_exist->lot." " : "";
+		$km=(!is_null($ruc_exist->km) && !empty($ruc_exist->km) && $ruc_exist->km!='-' && $ruc_exist->km!='----') ? "KM. ".$ruc_exist->km." " : "";
+		if (!is_null($ruc_exist->number) && !empty($ruc_exist->number) && $ruc_exist->number!='-' && $ruc_exist->number!='----') {
 			$address=$type_way.$name_way.$number.$inside.$dpto.$zone_code.$type_zone.$block.$lot.$km;
 		} else {
 			$address=$type_way.$name_way.$block.$lot.$km.$inside.$dpto.$zone_code.$type_zone;

@@ -27,7 +27,7 @@ class RucsImport implements ToCollection, WithCustomCsvSettings, WithBatchInsert
                     'ruc' => ($row[0]!="-" && $row[0]!="----") ? $row[0] : NULL,
                     'name' => ($row[1]!="-" && $row[1]!="----") ? $row[1] : NULL,
                     'state' => ($row[2]!="-" && $row[2]!="----") ? $row[2] : NULL,
-                    'condition' => ($row[3]!="-" && $row[3]!="----") ? $row[3] : NULL,
+                    'condition_' => ($row[3]!="-" && $row[3]!="----") ? $row[3] : NULL,
                     'ubigeo' => ($row[4]!="-" && $row[4]!="----") ? $row[4] : NULL,
                     'type_way' => ($row[5]!="-" && $row[5]!="----") ? $row[5] : NULL,
                     'name_way' => ($row[6]!="-" && $row[6]!="----") ? $row[6] : NULL,
