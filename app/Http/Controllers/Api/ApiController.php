@@ -16,6 +16,7 @@ use Peru\Sunat\RucFactory;
 use Peru\Jne\DniFactory;
 use Goutte\Client;
 use App\Rules\Mac;
+use Http;
 
 class ApiController extends Controller
 {
@@ -71,16 +72,16 @@ class ApiController extends Controller
 			}
 
 			try {
-				$client=new Client();
-				$crawler=$client->request('GET', 'https://eldni.com/pe/buscar-por-dni');
-				$form=$crawler->selectButton('Buscar nombres')->form();
-				$crawler=$client->submit($form, ['dni' => $dni]);
+				$response=Http::withHeaders([
+					'Accept' => 'application/json',
+					'Referer' => 'https://apis.net.pe/api-consulta-dni'
+				])->withToken('apis-token-971.o9xM0M4f57rvhc10AgRPO-KuN5M2YGwh')->get('https://api.apis.net.pe/v1/dni', [
+					'numero' => $dni
+				]);
+				$data=$response->json();
 
-				$data=$crawler->filter("table tbody td")->each(function($dataNodes) {
-					return $dataNodes->text();
-				});
-				if (is_array($data)) {
-					$data=array('dni' => $data[0], 'name' => $data[1], 'first_lastname' => $data[2], 'second_lastname' => $data[3]);
+				if ($response->status()==200 && is_array($data)) {
+					$data=array('dni' => $dni, 'name' => $data['nombres'], 'first_lastname' => $data['apellidoPaterno'], 'second_lastname' => $data['apellidoMaterno']);
 					Dni::create($data);
 					$code->fill(['queries' => $code->queries+1])->save();
 
@@ -89,7 +90,43 @@ class ApiController extends Controller
 						$query->fill(['queries' => $query->queries+1])->save();
 					}
 
-					$data=array('dni' => $data[0], 'nombres' => $data[1], 'apellidopaterno' => $data[2], 'apellidomaterno' => $data[3]);
+					$data=array('dni' => $dni, 'nombres' => $data['name'], 'apellidopaterno' => $data['first_lastname'], 'apellidomaterno' => $data['second_lastname'], 'codverifica' => '');
+					return response()->json(['status' => 200, "data" => $data], 200);
+				}
+
+			} catch (Exception $e) {
+				Log::error($e->getMessage());
+			}
+
+			try {
+				$response=Http::withHeaders([
+					'Accept' => 'application/json'
+				])->post('https://api.migo.pe/api/v1/dni', [
+					'token' => 'RX4zI2LPbKkWMWgjfnXSe5jsk84Aj3chPAkn8Dki82keaErvV6pRIEedXuUc',
+					'dni' => $dni
+				]);
+				$data=$response->json();
+
+				if ($response->status()==200 && is_array($data) && $data['success']) {
+
+					$names="";
+					$array_names=explode(' ', $data['nombre']);
+					foreach($array_names as $name) {
+						if ($array_names[0]!=$name && $array_names[1]!=$name) {
+							$names.=(empty($names)) ? $name : ' '.$name;
+						}
+					}
+
+					$data=array('dni' => $dni, 'name' => $names, 'first_lastname' => $array_names[0], 'second_lastname' => $array_names[1]);
+					Dni::create($data);
+					$code->fill(['queries' => $code->queries+1])->save();
+
+					$query=Query::where([['type', '1'], ['code_id', $code->id]])->first();
+					if (!is_null($query)) {
+						$query->fill(['queries' => $query->queries+1])->save();
+					}
+
+					$data=array('dni' => $dni, 'nombres' => $data['name'], 'apellidopaterno' => $data['first_lastname'], 'apellidomaterno' => $data['second_lastname'], 'codverifica' => '');
 					return response()->json(['status' => 200, "data" => $data], 200);
 				}
 
@@ -106,7 +143,7 @@ class ApiController extends Controller
 			$query->fill(['queries' => $query->queries+1])->save();
 		}
 
-		$data=array('dni' => $dni_exist->dni, 'nombres' => $dni_exist->name, 'apellidopaterno' => $dni_exist->first_lastname, 'apellidomaterno' => $dni_exist->second_lastname);
+		$data=array('dni' => $dni_exist->dni, 'nombres' => $dni_exist->name, 'apellidopaterno' => $dni_exist->first_lastname, 'apellidomaterno' => $dni_exist->second_lastname, 'codverifica' => '');
 		if (!is_null($dni_exist->code)) {
 			$data=array('dni' => $dni_exist->dni, 'nombres' => $dni_exist->name, 'apellidopaterno' => $dni_exist->first_lastname, 'apellidomaterno' => $dni_exist->second_lastname, 'codverifica' => $dni_exist->code);
 		}
