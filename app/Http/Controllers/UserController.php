@@ -79,7 +79,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(User $user) {
-        $codes=$user->codes;
+        $codes=$user->codes()->with(['macs'])->get();
         return view('admin.users.show', compact('user', 'codes'));
     }
 

@@ -154,7 +154,8 @@ return [
         'password_confirmation' => 'confirmar contraseña',
         'state'                 => 'estado',
         'limit'                 => 'límite',
-        'company'               => 'empresa'
+        'company'               => 'empresa',
+        'qty_mac'               => 'cantidad de mac'
     ],
 ];
 ?>

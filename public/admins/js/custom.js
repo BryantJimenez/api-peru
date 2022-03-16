@@ -278,6 +278,15 @@ $(document).ready(function() {
       buttonup_class: 'btn btn-primary pt-2 pb-3'
     });
   }
+
+  if ($('.min-int').length) {
+    $(".min-int").TouchSpin({
+      min: 1,
+      max: 999999999,
+      buttondown_class: 'btn btn-primary pt-2 pb-3',
+      buttonup_class: 'btn btn-primary pt-2 pb-3'
+    });
+  }
 });
 
 // funcion para cambiar el input hidden al cambiar el switch de estado
@@ -332,7 +341,7 @@ function addCode() {
 };
 
 // Funcion para abrir modal de edicion de codigo
-function editCode(code, name, limit, infinity) {
+function editCode(code, name, limit, infinity, mac) {
   if (infinity) {
     $('#limitInfinityEdit').addClass('btn-danger');
     $('#limitInfinityEdit').removeClass('btn-primary');
@@ -350,6 +359,7 @@ function editCode(code, name, limit, infinity) {
   }
   $('#formEditCodeModal input[name="code"]').val(code);
   $('#formEditCodeModal input[name="name"]').val(name);
+  $('#formEditCodeModal input[name="qty_mac"]').val(mac);
   $("#editCode").modal();
   $('#formEditCodeModal').attr('action', '/admin/codigos/' + code);
 };

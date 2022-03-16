@@ -284,6 +284,11 @@ $(document).ready(function(){
 				limit: {
 					required: true,
 					min: 1
+				},
+
+				qty_mac: {
+					required: true,
+					min: 1
 				}
 			},
 			submitHandler: function(form) {
@@ -305,6 +310,11 @@ $(document).ready(function(){
 				},
 				
 				limit: {
+					required: true,
+					min: 1
+				},
+
+				qty_mac: {
 					required: true,
 					min: 1
 				}

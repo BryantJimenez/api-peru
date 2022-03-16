@@ -4,6 +4,9 @@
 
 @section('links')
 <link href="{{ asset('/admins/css/users/user-profile.css') }}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="{{ asset('/admins/vendor/table/datatable/datatables.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('/admins/vendor/table/datatable/custom_dt_html5.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('/admins/vendor/table/datatable/dt-global_style.css') }}">
 @endsection
 
 @section('content')
@@ -110,6 +113,7 @@
 											<th>RUC</th>
 											<th>Total</th>
 											<th>Límite</th>
+											<th>MACs</th>
 											<th>Estado</th>
 											@if(auth()->user()->can('codes.revert'))
 											<th>Acciones</th>
@@ -126,11 +130,12 @@
 											<td>{{ $code->inquiries->where('type', '2')->first()->queries }}</td>
 											<td>{{ $code->queries }}</td>
 											<td>@if(is_null($code->limit)){{ 'Ilimitadas' }}@else{{ $code->limit }}@endif</td>
+											<td>{{ $code['macs']->count().'/'.$code->qty_mac }}</td>
 											<td>{!! state($code->state) !!}</td>
 											@if(auth()->user()->can('codes.revert'))
 											<td>
 												<div class="btn-group" role="group">
-													@if(!is_null($code->mac))
+													@if($code['macs']->count()>0)
 													@can('codes.revert')
 													<button type="button" class="btn btn-warning btn-sm bs-tooltip" title="Revertir MAC" onclick="revertCode('{{ $code->code }}')"><i class="fas fa-history"></i></button>
 													@endcan
@@ -175,4 +180,12 @@
 </div>
 @endcan
 
+@endsection
+
+@section('scripts')
+<script src="{{ asset('/admins/vendor/table/datatable/datatables.js') }}"></script>
+<script src="{{ asset('/admins/vendor/table/datatable/button-ext/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('/admins/vendor/table/datatable/button-ext/jszip.min.js') }}"></script>    
+<script src="{{ asset('/admins/vendor/table/datatable/button-ext/buttons.html5.min.js') }}"></script>
+<script src="{{ asset('/admins/vendor/table/datatable/button-ext/buttons.print.min.js') }}"></script>
 @endsection

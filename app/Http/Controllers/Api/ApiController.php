@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\User;
 use App\Code;
+use App\Mac;
 use App\Dni;
 use App\Ruc;
 use App\Query;
@@ -15,7 +16,7 @@ use Illuminate\Http\Request;
 use Peru\Sunat\RucFactory;
 use Peru\Jne\DniFactory;
 use Goutte\Client;
-use App\Rules\Mac;
+use App\Rules\Mac as MacRule;
 use Http;
 
 class ApiController extends Controller
@@ -25,7 +26,7 @@ class ApiController extends Controller
 			return response()->json(['status' => 401, 'message' => 'Este usuario esta desactivado.'], 401);
 		}
 
-		$code=Code::where('code', $code)->first();
+		$code=Code::with(['macs'])->where('code', $code)->first();
 		if (is_null($code)) {
 			return response()->json(['status' => 404, "message" => "El código no existe."], 404);
 		} elseif ($request->user()->id!=$code->user_id) {
@@ -38,13 +39,15 @@ class ApiController extends Controller
 
 		Validator::make(['dni' => $dni, 'mac' => request('mac')], [
 			'dni' => 'required|digits:8',
-			'mac' => ['required', new Mac()]
+			'mac' => ['required', new MacRule()]
 		])->validate();
 
-		if (is_null($code->mac)) {
-			$code->fill(['mac' => request('mac')])->save();
-		} elseif($code->mac!=request('mac')) {
-			return response()->json(['status' => 403, "message" => "No tienes permiso para acceder a la información."], 403);
+		if ($code['macs']->where('mac', request('mac'))->count()==0) {
+			if ($code->qty_mac>$code['macs']->count()) {
+				Mac::create(['mac' => request('mac'), 'code_id' => $code->id]);
+			} else {
+				return response()->json(['status' => 403, "message" => "No tienes permiso para acceder a la información."], 403);
+			}
 		}
 
 		$dni_exist=Dni::where('dni', $dni)->first();
@@ -80,7 +83,7 @@ class ApiController extends Controller
 				]);
 				$data=$response->json();
 
-				if ($response->status()==200 && is_array($data)) {
+				if ($response->status()==200 && is_array($data) && !empty($data)) {
 					$data=array('dni' => $dni, 'name' => $data['nombres'], 'first_lastname' => $data['apellidoPaterno'], 'second_lastname' => $data['apellidoMaterno']);
 					Dni::create($data);
 					$code->fill(['queries' => $code->queries+1])->save();
@@ -107,7 +110,7 @@ class ApiController extends Controller
 				]);
 				$data=$response->json();
 
-				if ($response->status()==200 && is_array($data) && $data['success']) {
+				if ($response->status()==200 && is_array($data) && !empty($data) && $data['success']) {
 
 					$names="";
 					$array_names=explode(' ', $data['nombre']);
@@ -134,7 +137,7 @@ class ApiController extends Controller
 				Log::error($e->getMessage());
 			}
 
-			return response()->json(['status' => 404, "message" => "Ha ocurrido un error, intentelo nuevamente."], 404);
+			return response()->json(['status' => 500, "message" => "Ha ocurrido un error, intentelo nuevamente."], 500);
 		}
 
 		$code->fill(['queries' => $code->queries+1])->save();
@@ -155,7 +158,7 @@ class ApiController extends Controller
 			return response()->json(['status' => 401, 'message' => 'Este usuario esta desactivado.'], 401);
 		}
 
-		$code=Code::where('code', $code)->first();
+		$code=Code::with(['macs'])->where('code', $code)->first();
 		if (is_null($code)) {
 			return response()->json(['status' => 404, "message" => "El código no existe."], 404);
 		} elseif ($request->user()->id!=$code->user_id) {
@@ -168,13 +171,15 @@ class ApiController extends Controller
 
 		Validator::make(['ruc' => $ruc, 'mac' => request('mac')], [
 			'ruc' => 'required|digits:11',
-			'mac' => ['required', new Mac()]
+			'mac' => ['required', new MacRule()]
 		])->validate();
-
-		if (is_null($code->mac)) {
-			$code->fill(['mac' => request('mac')])->save();
-		} elseif($code->mac!=request('mac')) {
-			return response()->json(['status' => 403, "message" => "No tienes permiso para acceder a la información."], 403);
+		
+		if ($code['macs']->where('mac', request('mac'))->count()==0) {
+			if ($code->qty_mac>$code['macs']->count()) {
+				Mac::create(['mac' => request('mac'), 'code_id' => $code->id]);
+			} else {
+				return response()->json(['status' => 403, "message" => "No tienes permiso para acceder a la información."], 403);
+			}
 		}
 
 		$ruc_exist=Ruc::where('ruc', $ruc)->first();
@@ -212,7 +217,7 @@ class ApiController extends Controller
 					return $dataNodes->filter("div[class='col-sm-7']")->text();
 				});
 
-				if (is_array($data)) {
+				if (is_array($data) && !empty($data)) {
 					$code->fill(['queries' => $code->queries+1])->save();
 
 					$query=Query::where([['type', '1'], ['code_id', $code->id]])->first();

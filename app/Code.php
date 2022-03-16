@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Code extends Model
 {
-    protected $fillable = ['name', 'code', 'queries', 'limit', 'mac', 'state', 'user_id'];
+    protected $fillable = ['name', 'code', 'queries', 'limit', 'qty_mac', 'state', 'user_id'];
 
     /**
      * Retrieve the model for a bound value.
@@ -26,5 +26,9 @@ class Code extends Model
 
     public function inquiries() {
         return $this->hasMany(Query::class);
+    }
+
+    public function macs() {
+        return $this->hasMany(Mac::class);
     }
 }

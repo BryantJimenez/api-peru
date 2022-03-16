@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\Code;
+use App\Mac;
 use App\Query;
 use App\Http\Requests\CodeStoreRequest;
 use App\Http\Requests\CodeUpdateRequest;
@@ -24,7 +25,7 @@ class CodeController extends Controller
         
         // Agregar codigo de API al usuario
         $code=generate_code();
-        $data=array('name' => request('name'), 'code' => $code, 'limit' => request('limit'), 'user_id' => $user->id);
+        $data=array('name' => request('name'), 'code' => $code, 'limit' => request('limit'), 'qty_mac' => request('qty_mac'), 'user_id' => $user->id);
         $code=Code::create($data);
 
         if ($code) {
@@ -45,10 +46,11 @@ class CodeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(CodeUpdateRequest $request, Code $code) {
-        $data=array('name' => request('name'), 'limit' => request('limit'));
+        $data=array('name' => request('name'), 'limit' => request('limit'), 'qty_mac' => request('qty_mac'));
         $code->fill($data)->save();
 
         if ($code) {
+            Mac::where('code_id', $code->id)->delete();
             return redirect()->back()->with(['alert' => 'sweet', 'type' => 'success', 'title' => 'Edición exitosa', 'msg' => 'El código ha sido editado exitosamente.']);
         } else {
             return redirect()->back()->with(['alert' => 'lobibox', 'type' => 'error', 'title' => 'Edición fallida', 'msg' => 'Ha ocurrido un error durante el proceso, intentelo nuevamente.']);
@@ -90,7 +92,7 @@ class CodeController extends Controller
     }
 
     public function revert(Request $request, Code $code) {
-        $code->fill(['mac' => NULL])->save();
+        $code=Mac::where('code_id', $code->id)->delete();
         if ($code) {
             return redirect()->back()->with(['alert' => 'sweet', 'type' => 'success', 'title' => 'Edición exitosa', 'msg' => 'El código ha sido revertido exitosamente.']);
         } else {

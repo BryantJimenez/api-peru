@@ -25,7 +25,8 @@ class CodeStoreRequest extends FormRequest
   {
     return [
       'name' => 'required|string|min:2|max:191',
-      'limit' => 'nullable|numeric|min:1'
+      'limit' => 'nullable|numeric|min:1',
+      'qty_mac' => 'required|numeric|min:1'
     ];
   }
 }

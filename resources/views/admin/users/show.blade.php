@@ -129,6 +129,7 @@
 											<th>RUC</th>
 											<th>Total</th>
 											<th>Límite</th>
+											<th>MACs</th>
 											<th>Estado</th>
 											@if(auth()->user()->can('codes.edit') || auth()->user()->can('codes.active') || auth()->user()->can('codes.deactive') || auth()->user()->can('codes.revert') || auth()->user()->can('codes.delete'))
 											<th>Acciones</th>
@@ -145,12 +146,13 @@
 											<td>{{ $code->inquiries->where('type', '2')->first()->queries }}</td>
 											<td>{{ $code->queries }}</td>
 											<td>@if(is_null($code->limit)){{ 'Ilimitadas' }}@else{{ $code->limit }}@endif</td>
+											<td>{{ $code['macs']->count().'/'.$code->qty_mac }}</td>
 											<td>{!! state($code->state) !!}</td>
 											@if(auth()->user()->can('codes.edit') || auth()->user()->can('codes.active') || auth()->user()->can('codes.deactive') || auth()->user()->can('codes.revert') || auth()->user()->can('codes.delete'))
 											<td>
 												<div class="btn-group" role="group">
 													@can('codes.edit')
-													<button type="button" class="btn btn-info btn-sm bs-tooltip" title="Editar" onclick="editCode('{{ $code->code }}', '{{ $code->name }}', '{{ $code->limit }}', @if(is_null($code->limit)){{ true }}@else{{ false }}@endif)"><i class="fa fa-edit"></i></button>
+													<button type="button" class="btn btn-info btn-sm bs-tooltip" title="Editar" onclick="editCode('{{ $code->code }}', '{{ $code->name }}', '{{ $code->limit }}', @if(is_null($code->limit)){{ 'true' }}@else{{ 'false' }}@endif, {{ $code->qty_mac }})"><i class="fa fa-edit"></i></button>
 													@endcan
 													@if($code->state==1)
 													@can('codes.deactive')
@@ -161,7 +163,7 @@
 													<button type="button" class="btn btn-success btn-sm bs-tooltip" title="Activar" onclick="activeCode('{{ $code->code }}')"><i class="fa fa-check"></i></button>
 													@endcan
 													@endif
-													@if(!is_null($code->mac))
+													@if($code['macs']->count()>0)
 													@can('codes.revert')
 													<button type="button" class="btn btn-warning btn-sm bs-tooltip" title="Revertir MAC" onclick="revertCode('{{ $code->code }}')"><i class="fas fa-history"></i></button>
 													@endcan
@@ -214,6 +216,11 @@
 
 						<input type="text" class="form-control d-none" disabled value="Ilimitadas" id="infinityCreate">
 					</div>
+
+					<div class="form-group col-12">
+						<label class="col-form-label">Cantidad de MACs<b class="text-danger">*</b></label>
+						<input class="form-control min-int @error('qty_mac') is-invalid @enderror" type="text" name="qty_mac" required placeholder="Introduzca la cantidad de macs" value="1">
+					</div>
 				</div>
 			</div>
 			<div class="modal-footer">
@@ -258,6 +265,11 @@
 						</div>
 
 						<input type="text" class="form-control d-none" disabled value="Ilimitadas" id="infinityEdit">
+					</div>
+
+					<div class="form-group col-12">
+						<label class="col-form-label">Cantidad de MACs<b class="text-danger">*</b></label>
+						<input class="form-control min-int @error('qty_mac') is-invalid @enderror" type="text" name="qty_mac" required placeholder="Introduzca la cantidad de macs" value="1">
 					</div>
 				</div>
 			</div>

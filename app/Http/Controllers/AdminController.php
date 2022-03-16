@@ -25,7 +25,7 @@ class AdminController extends Controller
     }
 
     public function profile() {
-        $codes=Auth::user()->codes;
+        $codes=Auth::user()->codes()->with(['macs'])->get();
         return view('admin.profile', compact('codes'));
     }
 
